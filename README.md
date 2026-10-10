@@ -99,6 +99,10 @@ authentication). Send one text command per datagram: `throttle <0..1>`,
 a JSON line about 20 times per second with `rpm`, `throttle`, `speed_kph`,
 `torque_nm`, `gear`, `ignition`, `starter`, and `dyno`.
 
+A Python client lives in [python/](python). Install it with
+`pip install ./python`, then
+`with RemoteClient(port) as c: c.throttle(0.5); print(c.latest())`.
+
 For example, set the environment variable to enable the remote control interface:
 
 ```sh
