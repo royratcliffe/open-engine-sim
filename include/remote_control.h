@@ -1,5 +1,5 @@
-#ifndef ATG_ENGINE_SIM_REMOTE_CONTROL_H
-#define ATG_ENGINE_SIM_REMOTE_CONTROL_H
+#ifndef OPEN_ENGINE_SIM_REMOTE_CONTROL_H
+#define OPEN_ENGINE_SIM_REMOTE_CONTROL_H
 
 #include <chrono>
 #include <cstdint>
