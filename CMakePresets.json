@@ -82,7 +82,7 @@
       "name": "windows-x86_64-desktop-base",
       "hidden": true,
       "inherits": "windows-x86_64",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Visual Studio 18 2026",
       "cacheVariables": {
         "ENGINE_SIM_BUILD_DESKTOP": "ON",
         "ENGINE_SIM_BUILD_SCRIPTING": "ON"
