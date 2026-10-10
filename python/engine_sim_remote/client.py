@@ -133,19 +133,19 @@ class RemoteClient:
         """
         if not self._subscribed:
             self.subscribe()
-        previous = self._socket.gettimeout()
+        previous_timeout = self._socket.gettimeout()
         if timeout is not None:
             self._socket.settimeout(timeout)
         try:
             data, _ = self._socket.recvfrom(1024)
         finally:
-            self._socket.settimeout(previous)
+            self._socket.settimeout(previous_timeout)
         return Telemetry.from_json(data.decode("ascii", "replace"))
 
     def latest(self, timeout: Optional[float] = None) -> Telemetry:
         """Discard queued samples and return the freshest one."""
         sample = self.telemetry(timeout)
-        previous = self._socket.gettimeout()
+        previous_timeout = self._socket.gettimeout()
         self._socket.settimeout(0.0)
         try:
             while True:
@@ -158,7 +158,7 @@ class RemoteClient:
                 # Decode as ASCII, replacing any invalid characters.
                 sample = Telemetry.from_json(data.decode("ascii", "replace"))
         finally:
-            self._socket.settimeout(previous)
+            self._socket.settimeout(previous_timeout)
         return sample
 
     def stream(self) -> Iterator[Telemetry]:
