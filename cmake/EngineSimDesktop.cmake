@@ -6,8 +6,13 @@ add_executable(engine-sim-desktop
     src/desktop_platform_sdl.cpp
     src/sdl_audio_util.cpp
     src/sdl_audio_output.cpp
-    src/sdl_gpu_renderer.cpp)
+    src/sdl_gpu_renderer.cpp
+    src/remote_protocol.cpp
+    src/remote_control.cpp)
 target_link_libraries(engine-sim-desktop PRIVATE SDL3::SDL3 engine-sim-visualization)
+if(WIN32)
+    target_link_libraries(engine-sim-desktop PRIVATE ws2_32)
+endif()
 target_compile_features(engine-sim-desktop PRIVATE cxx_std_17)
 target_compile_definitions(engine-sim-desktop PRIVATE
     ENGINE_SIM_SHADER_DIRECTORY="${CMAKE_CURRENT_BINARY_DIR}/shaders"

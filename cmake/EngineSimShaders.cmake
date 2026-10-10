@@ -5,7 +5,9 @@ function(engine_sim_add_shader_artifacts target source output_directory)
     set(ENGINE_SIM_SHADERCROSS_EXECUTABLE "" CACHE FILEPATH
         "Path to the SDL_shadercross offline compiler")
     if(NOT ENGINE_SIM_SHADERCROSS_EXECUTABLE)
-        find_program(ENGINE_SIM_SHADERCROSS_EXECUTABLE NAMES shadercross)
+        find_program(ENGINE_SIM_SHADERCROSS_EXECUTABLE NAMES shadercross
+            HINTS "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/tools/sdl3-shadercross"
+                  "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/sdl3-shadercross")
     endif()
     if(NOT ENGINE_SIM_SHADERCROSS_EXECUTABLE)
         message(STATUS
@@ -51,5 +53,19 @@ function(engine_sim_add_shader_artifacts target source output_directory)
         list(APPEND outputs "${spirv}" "${msl}" "${dxil}")
     endforeach()
 
-    add_custom_target(${target} DEPENDS ${outputs})
+    # Keep the checked-in artifacts in assets/shaders in sync with the HLSL
+    # source whenever the shader target is built.
+    option(ENGINE_SIM_UPDATE_SHADER_ARTIFACTS
+        "Copy regenerated SDL GPU shader artifacts into assets/shaders" ON)
+    add_custom_target(${target} ALL DEPENDS ${outputs}
+        COMMENT "Generating SDL GPU shader artifacts")
+    if(ENGINE_SIM_UPDATE_SHADER_ARTIFACTS)
+        get_filename_component(source_directory "${source}" DIRECTORY)
+        foreach(output IN LISTS outputs)
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                    "${output}" "${source_directory}"
+                VERBATIM)
+        endforeach()
+    endif()
 endfunction()

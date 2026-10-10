@@ -100,6 +100,7 @@ class EngineSimApplication {
         float getAverageFramerate() const { return m_averageFramerate; }
 
         Simulator *getSimulator() { return m_simulator; }
+        double getThrottle() const { return m_speedSetting; }
         InfoCluster *getInfoCluster() { return m_infoCluster; }
         ApplicationSettings* getAppSettings() { return &m_applicationSettings; }
 

@@ -25,7 +25,8 @@ add_executable(engine-sim-core-tests
     test/text_renderer_test.cpp
     test/authored_mesh_library_test.cpp
     test/engine_catalog_test.cpp
-    src/text_renderer.cpp
+    test/remote_protocol_test.cpp
+    src/remote_protocol.cpp    src/text_renderer.cpp
     src/authored_mesh_library.cpp
     src/engine_catalog.cpp)
 if(ENGINE_SIM_BUILD_SCRIPTING)

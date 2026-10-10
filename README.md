@@ -82,6 +82,35 @@ Install CMake 3.24+, Ninja, and a C++17 compiler. Script-enabled desktop builds
 also require Flex and Bison 3.2+. SDL3 is found or fetched by CMake. Shader
 artifacts are included; SDL_shadercross is only required to regenerate them.
 
+SDL GPU shader artifacts are regenerated automatically on every build when
+`shadercross` is found (on `PATH`, in the vcpkg `sdl3-shadercross` tools directory,
+or via `-DENGINE_SIM_SHADERCROSS_EXECUTABLE=<path>`). The `engine-sim-shaders`
+target builds SPIR-V, DXIL, and MSL for both stages under `build/<preset>/shaders`
+and copies them into `assets/shaders`. Pass `-DENGINE_SIM_UPDATE_SHADER_ARTIFACTS=OFF`
+to skip the copy.
+
+### Remote control and telemetry
+
+The desktop build has an optional UDP interface, off by default. Set
+`ENGINE_SIM_REMOTE_PORT` to a port to bind `127.0.0.1` (loopback only, no
+authentication). Send one text command per datagram: `throttle <0..1>`,
+`throttle off`, `starter on|off`, `ignition toggle`, `gear up|down`,
+`dyno toggle`, `subscribe`, `unsubscribe`. After `subscribe`, the sender receives
+a JSON line about 20 times per second with `rpm`, `throttle`, `speed_kph`,
+`torque_nm`, `gear`, `ignition`, `starter`, and `dyno`.
+
+For example, set the environment variable to enable the remote control interface:
+
+```sh
+export ENGINE_SIM_REMOTE_PORT=49555
+```
+
+On Windows, use:
+
+```powershell
+setx ENGINE_SIM_REMOTE_PORT 49555
+```
+
 ### Build and run
 
 The Makefile wraps the CMake presets. Set `PLATFORM` to one of

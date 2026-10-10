@@ -3,7 +3,10 @@
 #include "../include/runtime_paths.h"
 #include "../include/sdl_gpu_renderer.h"
 #include "../include/sdl_audio_output.h"
+#include "../include/remote_control.h"
 
+#include <cstdint>
+#include <cstdlib>
 #include <cstdio>
 #include <filesystem>
 
@@ -31,7 +34,22 @@ int main(int, char **) {
     EngineSimApplication application;
     SdlAudioOutput audioOutput;
     application.initialize(&platform, &renderer, &audioOutput, paths);
-    application.run();
+
+    // Opt-in: set ENGINE_SIM_REMOTE_PORT to enable the loopback UDP interface.
+    RemoteControl remote;
+    if (const char *portText = std::getenv("ENGINE_SIM_REMOTE_PORT")) {
+        const long port = std::strtol(portText, nullptr, 10);
+        if (port > 0 && port <= 65535 && remote.open(static_cast<std::uint16_t>(port))) {
+            std::fprintf(stderr, "Remote control listening on 127.0.0.1:%ld\n", port);
+        } else {
+            std::fprintf(stderr, "Remote control disabled: invalid or unavailable port '%s'\n", portText);
+        }
+    }
+    while (application.tick()) {
+        remote.poll(application);
+        platform.delay(1);
+    }
+    remote.close();
     application.destroy();
 
     renderer.shutdown();
