@@ -483,3 +483,27 @@ void SdlGpuRenderer::endFrame() {
 const char *SdlGpuRenderer::lastError() const {
     return m_error.empty() ? SDL_GetError() : m_error.c_str();
 }
+
+// Accessor for the backend description. Returns a string describing the
+// rendering backend, including the driver and device information if
+// available.
+std::string SdlGpuRenderer::backendDescription() const {
+    if (m_gpuDevice == nullptr) return "SDL GPU (uninitialised)";
+
+    const char *driver = SDL_GetGPUDeviceDriver(m_gpuDevice);
+    const SDL_PropertiesID properties = SDL_GetGPUDeviceProperties(m_gpuDevice);
+    const char *device = properties != 0
+        ? SDL_GetStringProperty(properties, SDL_PROP_GPU_DEVICE_NAME_STRING, nullptr)
+        : nullptr;
+
+    std::string description = "SDL GPU";
+    if (driver != nullptr && driver[0] != '\0') {
+        description += " / ";
+        description += driver;
+    }
+    if (device != nullptr && device[0] != '\0') {
+        description += " / ";
+        description += device;
+    }
+    return description;
+}

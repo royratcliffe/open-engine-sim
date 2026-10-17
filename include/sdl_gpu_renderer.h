@@ -43,6 +43,8 @@ public:
         int layer) override;
     void endFrame() override;
     const char *lastError() const;
+    // Returns a human-readable description of the rendering backend.
+    std::string backendDescription() const;
 
 private:
     void *m_window;

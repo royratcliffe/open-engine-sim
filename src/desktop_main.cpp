@@ -30,6 +30,7 @@ int main(int, char **) {
         std::fprintf(stderr, "SDL GPU initialization failed: %s\n", renderer.lastError());
         return 1;
     }
+    std::fprintf(stderr, "Renderer: %s\n", renderer.backendDescription().c_str());
 
     EngineSimApplication application;
     SdlAudioOutput audioOutput;
