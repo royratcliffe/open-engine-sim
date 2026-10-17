@@ -9,6 +9,9 @@ add_executable(engine-sim-desktop
     src/sdl_gpu_renderer.cpp
     src/remote_protocol.cpp
     src/remote_control.cpp)
+if(WIN32)
+    set_target_properties(engine-sim-desktop PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 target_link_libraries(engine-sim-desktop PRIVATE SDL3::SDL3 engine-sim-visualization)
 if(WIN32)
     target_link_libraries(engine-sim-desktop PRIVATE ws2_32)

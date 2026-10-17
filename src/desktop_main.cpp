@@ -10,7 +10,12 @@
 #include <cstdio>
 #include <filesystem>
 
-int main(int, char **) {
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
+int runDesktopApplication() {
     DesktopPlatformSdl platform;
     if (!platform.initialize("Open Engine Simulator", 1920, 1080)) {
         std::fprintf(stderr, "SDL initialization failed: %s\n", platform.lastError().c_str());
@@ -57,3 +62,15 @@ int main(int, char **) {
     platform.shutdown();
     return 0;
 }
+
+// Entry point for the desktop application. On Windows, use WinMain; on
+// other platforms, use main.
+#if defined(_WIN32)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+    return runDesktopApplication();
+}
+#else
+int main() {
+    return runDesktopApplication();
+}
+#endif
