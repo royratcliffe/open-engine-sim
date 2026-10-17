@@ -52,6 +52,9 @@ class EngineSimApplication {
         // Browser hosts call this from requestAnimationFrame instead of using
         // the blocking native run() loop.
         bool tick();
+        // Waits until the next frame should be rendered. Caps the
+        // framerate to synchronise with the display refresh rate.
+        void waitForNextFrame();
         void destroy();
 
         void loadEngine(Engine *engine, Vehicle *vehicle, Transmission *transmission);
@@ -145,7 +148,7 @@ class EngineSimApplication {
         float m_displayHeight;
         int m_screenWidth;
         int m_screenHeight;
-        
+
         ApplicationSettings m_applicationSettings;
         Shaders m_shaders;
 

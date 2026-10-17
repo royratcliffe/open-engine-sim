@@ -47,7 +47,7 @@ int main(int, char **) {
     }
     while (application.tick()) {
         remote.poll(application);
-        platform.delay(1);
+        application.waitForNextFrame();
     }
     remote.close();
     application.destroy();

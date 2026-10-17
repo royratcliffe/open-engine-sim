@@ -29,6 +29,12 @@ extern "C" void *SDL_GetAndroidActivity(void);
 #endif
 
 namespace {
+#if defined(__EMSCRIPTEN__)
+constexpr std::uint64_t kRenderIntervalMs = 0;
+#else
+constexpr std::uint64_t kRenderIntervalMs = 33;
+#endif
+
 #if defined(__ANDROID__)
 void openAndroidEnginePicker() {
     JNIEnv *env = static_cast<JNIEnv *>(SDL_GetAndroidJNIEnv());
@@ -202,22 +208,36 @@ void EngineSimApplication::initialize() {
 
 void EngineSimApplication::run() {
     while (tick()) {
+        waitForNextFrame();
+    }
+}
+
+void EngineSimApplication::waitForNextFrame() {
+    if (m_platform == nullptr) return;
+#if defined(__EMSCRIPTEN__)
+    return;
+#elif defined(__ANDROID__)
+    m_platform->delay(1);
+#else
+    // Cap the frame rate. The target frame interval in milliseconds is
+    // defined by kRenderIntervalMs. If the elapsed time since the last
+    // render is less than this interval, delay the next frame.
+    const std::uint64_t elapsed = m_platform->ticks() - m_lastRenderTick;
+    if (m_lastRenderTick != 0 && elapsed < kRenderIntervalMs) {
+        m_platform->delay(static_cast<std::uint32_t>(kRenderIntervalMs - elapsed));
+    } else {
         m_platform->delay(1);
     }
+#endif
 }
 
 bool EngineSimApplication::tick() {
     if (m_platform == nullptr) return false;
     if (m_lastTick == 0) m_lastTick = m_platform->ticks();
-#if defined(__EMSCRIPTEN__)
-    constexpr std::uint64_t renderIntervalMs = 0;
-#elif defined(__ANDROID__)
-    // Keep presentation at 30 Hz on Android. The simulator/audio path keeps
+#if defined(__ANDROID__)
+    // Keep presentation at no more than 30 Hz on Android. The simulator/audio path keeps
     // running between presentations, so spare CPU time goes to synthesis
     // instead of producing 40-50 FPS bursts that can starve audio.
-    constexpr std::uint64_t renderIntervalMs = 33;
-#else
-    constexpr std::uint64_t renderIntervalMs = 50;
 #endif
     m_platform->pumpEvents();
     if (m_platform->shouldQuit() || m_platform->wasKeyPressed(DesktopKey::Escape)) return false;
@@ -351,7 +371,7 @@ bool EngineSimApplication::tick() {
         if (audioReady < audioRenderGuardSeconds) renderAllowed = false;
     }
 #endif
-    if (renderAllowed && now - m_lastRenderTick >= renderIntervalMs) {
+    if (renderAllowed && now - m_lastRenderTick >= kRenderIntervalMs) {
 #if defined(__ANDROID__)
         const std::uint64_t renderStart = m_platform->ticks();
 #endif
