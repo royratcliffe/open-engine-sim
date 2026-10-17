@@ -49,7 +49,7 @@ class RemoteClient:
     """UDP client for the simulator's loopback remote-control interface."""
 
     def __init__(self, port: int, host: str = "127.0.0.1", timeout: float = 2.0):
-        """Initialize a client connected to the simulator on ``host:port``."""
+        """Set up a client connected to the simulator on ``host:port``."""
         if not 0 < port <= 65535:
             raise RemoteError(f"invalid port: {port}")
         self._address = (host, port)
